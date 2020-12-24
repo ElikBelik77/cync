@@ -1,8 +1,8 @@
 #ifndef DLINKED_LIST_
 #define DLINKED_LIST_
-typedef struct _tagDLinkedList {
-	struct _tagDLinkedList* fd;
-	struct _tagDLinkedList* bk;
+typedef struct DLinkedList_t {
+	struct DLinkedList_t* fd;
+	struct DLinkedList_t* bk;
 	void* node_data;
 } DLinkedList;
 DLinkedList* dlist_create();

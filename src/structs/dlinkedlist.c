@@ -19,7 +19,8 @@ void dlist_free(DLinkedList* dlist, int cascade, void (*node_free)(void*)) {
 	DLinkedList* fd = dlist->fd;
 	DLinkedList* bk = dlist->bk;
 	void* node_data = dlist->node_data;
-	node_free(node_data);
+	if (node_free)
+		node_free(node_data);
 	free(dlist);
 	if (cascade && fd != NULL) {
 		dlist_free(fd, 1, node_free);
@@ -45,6 +46,6 @@ void dlist_unlink(DLinkedList** dlist, void (*node_free)(void*)) {
 		(*dlist)->bk->fd = (*dlist)->fd;
 	}
 	DLinkedList* new_ptr = (*dlist)->fd;
-	dlist_free(*dlist, 1, node_free);
+	dlist_free(*dlist, 0, node_free);
 	*dlist = new_ptr;
 }

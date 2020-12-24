@@ -1,5 +1,5 @@
-#include "structs/dlinkedlist.h"
+#include <stdlib.h>
+#include "structs/queue.h"
 int main() {
-	struct _tagDLinkedList* l = dlist_create();
 
 }
