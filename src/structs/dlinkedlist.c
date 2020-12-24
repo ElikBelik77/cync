@@ -42,7 +42,7 @@ void dlist_free(DLinkedList* dlist, void (*node_free)(void*)) {
         DLinkedList* bk = dlist->bk;
         dlist_unlink(&dlist, node_free);
 	if (fd)
-		dlist_unlink(&fd, node_free);
+		dlist_free(fd, node_free);
 	if (bk)
-		dlist_unlink(&bk, node_free);
+		dlist_free(bk, node_free);
 }
