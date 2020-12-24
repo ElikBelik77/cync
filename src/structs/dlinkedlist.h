@@ -6,7 +6,7 @@ typedef struct DLinkedList_t {
 	void* node_data;
 } DLinkedList;
 DLinkedList* dlist_create();
-void dlist_free(DLinkedList* dlist, int cascade, void (*node_free)(void*));
+void dlist_free(DLinkedList* dlist, void (*node_free)(void*));
 void dlist_insert(DLinkedList** dlist, void* element);
 void dlist_unlink(DLinkedList** dlist, void (*node_free)(void*));
 

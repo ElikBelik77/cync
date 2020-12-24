@@ -26,7 +26,7 @@ void queue_insert(Queue* q, void* element) {
 }
 
 void queue_free(Queue* queue, void (*free_ptr)(void*)) {
-	dlist_free(queue->head, 1, free_ptr);
+	dlist_free(queue->tail, free_ptr);
 	free(queue);
 }
 
