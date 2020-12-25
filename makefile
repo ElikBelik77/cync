@@ -8,7 +8,7 @@ OBJS = ${C_BUILD_PATH:.c=.o}
 all: clean $(BUILD_DIR)/$(TARGET_EXEC)
 
 $(BUILD_DIR)/$(TARGET_EXEC): ${OBJS}
-	gcc -o $@ $^
+	gcc -pthread -o $@ $^
 
 $(BUILD_DIR)/%.o: ${SRC_DIR}/%.c
 	$(MKDIR_P) $(dir $@)

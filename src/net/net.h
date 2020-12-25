@@ -10,13 +10,21 @@ typedef struct NetMessage_t {
 	Status status;
 } NetMessage;
 
-
+#if defined(unix) || defined(__unix__) || defined(__unix)
+#include <pthread.h>
 typedef struct NetWorker_t {
-	pid_t pid;
+	pthread_t* worker_thread;
 	Queue* in_message_queue;
 	Queue* out_message_queue;
 } NetWorker;
+#endif
 
+#if defined(__WIN32)
+typedef struct NetWorker_t {
+	Queue* in_message_queue;
+	Queue* out_message_queue;
+}
+#endif
 
 NetWorker* init_net_worker(size_t prot_preamble);
 void stop_net_worker(NetWorker* worker);
