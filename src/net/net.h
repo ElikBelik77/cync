@@ -5,12 +5,12 @@
 #include <stdbool.h>
 #include "../structs/queue.h"
 typedef enum Status { Failed = 0, Ok = 1} Status;
-typedef struct NetMessage_t {
-	char* message;
-	size_t message_size;
+typedef struct __attribute__((__packed__)) NetMessage_t {
+	uint32_t payload_size
+	char* payload;
 	Status status;
 } NetMessage;
-
+net_message_free(NetMessage* message);
 #if defined(unix) || defined(__unix__) || defined(__unix)
 #include <pthread.h>
 typedef struct NetWorker_t {

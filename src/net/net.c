@@ -4,11 +4,27 @@
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <poll.h>
 #include "net.h"
 #include "../structs/queue.h"
-
+NetMessage* net_message_deserialzie(char* message_data) {
+	NetMessage* msg = (NetMessage*)malloc(sizeof(netMessage));
+	memcpy(&(msg->payload_size), message_data, sizeof(msg->payload_size));
+	message_data += sizeof(msg->payload_size);
+	char* payload_buffer = (char*)malloc(msg->payload_size);
+	memcpy(msg->payload, message_data, message->payload_size);
+	memcpy(msg->status, message_data+message->payload_size, sizeof(msg->status));
+	return msg;
+}
+char* net_message_serialize(NetMessage* net_msg) {
+	char* sr = malloc(sizeof(net_msg->payload_size) + sizeof(net_msg->status)
+					+ net->payload_size);
+	memcpy(sr, &(net_msg->message_size)
+}
+void net_message_free(NetMessage* net_msg) {
+	free(net_msg->message);
+	free(net_msg);
+}
 int init_net_server(NetWorker* worker) {
 	struct sockaddr_in servaddr;
 	int sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -48,7 +64,7 @@ void* net_worker_routine(void* arg) {
 			continue;
 		}
 		connfd = accept(sockfd, (struct sockaddr*)&client_addr, &address_len);
-		int err = errno;
+		
 	}
 	close(sockfd);
 }
