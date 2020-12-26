@@ -17,6 +17,7 @@ void* queue_pop(Queue* queue) {
 		return NULL;
 	}
 	void* value = queue->tail->fd->node_data;
+	// Pop is equivalent to unlinking the front of the underlaying dlist.
 	dlist_unlink(&(queue->tail), NULL);
 	return value;
 }
@@ -26,6 +27,7 @@ void queue_insert(Queue* q, void* element) {
 }
 
 void queue_free(Queue* queue, void (*free_ptr)(void*)) {
+	// free the underlaying dlists and it's elements.
 	dlist_free(queue->tail, free_ptr);
 	free(queue);
 }

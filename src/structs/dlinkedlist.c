@@ -17,8 +17,8 @@ DLinkedList* dlist_create() {
 void dlist_insert(DLinkedList** dlist, void* element) {
 	DLinkedList* node = dlist_create();
 	node->node_data = element;
-	node->bk = *dlist;
-	(*dlist)->fd = node;
+	node->fd = *dlist;
+	(*dlist)->bk = node;
 	*dlist = node;
 }
 
@@ -38,6 +38,8 @@ void dlist_unlink(DLinkedList** dlist, void (*node_free)(void*)) {
 }
 
 void dlist_free(DLinkedList* dlist, void (*node_free)(void*)) {
+	//To free a dlist basically recursively unlink every node until there's
+	// nothing left.
         DLinkedList* fd = dlist->fd;
         DLinkedList* bk = dlist->bk;
         dlist_unlink(&dlist, node_free);
