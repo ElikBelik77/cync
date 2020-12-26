@@ -8,23 +8,31 @@
 #include "net.h"
 #include "../structs/queue.h"
 NetMessage* net_message_deserialzie(char* message_data) {
-	NetMessage* msg = (NetMessage*)malloc(sizeof(netMessage));
+	NetMessage* msg = (NetMessage*)malloc(sizeof(NetMessage));
 	memcpy(&(msg->payload_size), message_data, sizeof(msg->payload_size));
 	message_data += sizeof(msg->payload_size);
 	char* payload_buffer = (char*)malloc(msg->payload_size);
-	memcpy(msg->payload, message_data, message->payload_size);
-	memcpy(msg->status, message_data+message->payload_size, sizeof(msg->status));
+	memcpy(msg->payload, message_data, msg->payload_size);
+	memcpy(&(msg->status), message_data + msg->payload_size, sizeof(msg->status));
 	return msg;
 }
 char* net_message_serialize(NetMessage* net_msg) {
 	char* sr = malloc(sizeof(net_msg->payload_size) + sizeof(net_msg->status)
-					+ net->payload_size);
-	memcpy(sr, &(net_msg->message_size)
+					+ net_msg->payload_size);
+	char* ptr = sr;
+	memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
+	ptr += sizeof(net_msg->payload_size);
+	memcpy(ptr, net_msg->payload, net_msg->payload_size);
+	ptr += net_msg->payload_size;
+	memcpy(ptr, &(net_msg->status), sizeof(net_msg->status));
+	return sr;
 }
+
 void net_message_free(NetMessage* net_msg) {
-	free(net_msg->message);
+	free(net_msg->payload);
 	free(net_msg);
 }
+
 int init_net_server(NetWorker* worker) {
 	struct sockaddr_in servaddr;
 	int sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
