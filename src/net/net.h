@@ -1,11 +1,10 @@
 #ifndef NET_H_
 #define NET_H_
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../structs/queue.h"
-typedef enum Status { Failed = 0, Ok = 1} Status;
+typedef enum Status_e { Failed = 0, Ok = 1} Status;
 typedef struct __attribute__((__packed__)) NetMessage_t {
 	uint32_t payload_size;
 	char* payload;

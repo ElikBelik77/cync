@@ -4,29 +4,39 @@
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <poll.h>
 #include "net.h"
 #include "../structs/queue.h"
-NetMessage* net_message_deserialzie(char* message_data) {
-	NetMessage* msg = (NetMessage*)malloc(sizeof(NetMessage));
-	memcpy(&(msg->payload_size), message_data, sizeof(msg->payload_size));
-	message_data += sizeof(msg->payload_size);
-	char* payload_buffer = (char*)malloc(msg->payload_size);
-	memcpy(msg->payload, message_data, msg->payload_size);
-	memcpy(&(msg->status), message_data + msg->payload_size, sizeof(msg->status));
-	return msg;
-}
+void net_read(int sockfd, size_t nbytes, void* buffer);
+void net_write(int sockfd, void* data, size_t nbytes);
 char* net_message_serialize(NetMessage* net_msg) {
-	char* sr = malloc(sizeof(net_msg->payload_size) + sizeof(net_msg->status)
-					+ net_msg->payload_size);
-	char* ptr = sr;
-	memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
-	ptr += sizeof(net_msg->payload_size);
-	memcpy(ptr, net_msg->payload, net_msg->payload_size);
-	ptr += net_msg->payload_size;
-	memcpy(ptr, &(net_msg->status), sizeof(net_msg->status));
-	return sr;
+        char* sr = malloc(sizeof(net_msg->payload_size) + sizeof(net_msg->status));      
+        char* ptr = sr;
+        memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
+        ptr += sizeof(net_msg->payload_size);
+        memcpy(ptr, net_msg->payload, net_msg->payload_size);
+        return sr;
 }
+
+void* net_message_write(int sockfd, NetMessage* net_msg) {
+	char* serialized_msg = net_message_serialize(net_msg);
+	size_t serialized_length = sizeof(net_msg->payload_size) + net_msg->payload_size;
+	net_write(sockfd, serialized_msg, serialized_length);
+}
+
+NetMessage* net_message_read(int sockfd) {
+	size_t length;
+	net_read(sockfd, sizeof(uint32_t), &length);
+	char* payload_buffer = (char*)malloc(length);
+	net_read(sockfd, length, payload_buffer);
+	NetMessage* net_msg = (NetMessage*)malloc(sizeof(NetMessage));
+	net_msg->payload_size = length;
+	net_msg->payload = payload_buffer;
+	net_msg->status = Ok;
+	return net_msg;
+}
+
 
 void net_message_free(NetMessage* net_msg) {
 	free(net_msg->payload);
@@ -72,7 +82,8 @@ void* net_worker_routine(void* arg) {
 			continue;
 		}
 		connfd = accept(sockfd, (struct sockaddr*)&client_addr, &address_len);
-		
+		NetMessage* cli_msg = net_message_read(connfd);
+		queue_insert(context->in_message_queue, cli_msg);
 	}
 	close(sockfd);
 }
@@ -93,6 +104,32 @@ void net_worker_free(NetWorker* worker) {
 		queue_free(worker->out_message_queue, NULL);
 		free(worker->worker_thread);
 		free(worker);
+}
+
+void net_read(int sockfd, size_t nbytes, void* buffer) {
+        int bytes_read = 0;
+        int result;
+        while (bytes_read < nbytes) {
+                result = read(sockfd, buffer+bytes_read, nbytes-bytes_read);
+                if (result < 1) {
+                        fprintf(stderr, "error reading net message.\n");
+                        exit(0); //TODO: return flag to set status.failed.
+                }
+                bytes_read += result;
+        }
+
+}
+
+void net_write(int sockfd, void* data, size_t nbytes) {
+        int bytes_sent = 0;
+        int result;
+        while(bytes_sent < nbytes) {
+                result = write(sockfd, data+bytes_sent, nbytes-bytes_sent);
+                if (result == -1) {
+                        fprintf(stderr, "error writing to socket.\n");
+                        exit(0);
+                }
+        }
 }
 
 #endif
