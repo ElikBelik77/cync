@@ -1,0 +1,5 @@
+#ifndef CONFIGURATION_MANAGER_H_
+#define CONFIGURATION_MANAGER_H_
+
+
+#endif
