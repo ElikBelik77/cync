@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,8 @@ void net_read(int sockfd, size_t nbytes, void* buffer);
 void net_write(int sockfd, void* data, size_t nbytes);
 
 // Serializes a netmessage into char* (byte array).
-char* net_message_serialize(NetMessage* net_msg) {
-        char* sr = malloc(sizeof(net_msg->payload_size) + sizeof(net_msg->status));
+char* net_message_serialize(NetMessageOut* net_msg) {
+        char* sr = malloc(sizeof(net_msg->payload_size) + net_msg->payload_size);
         char* ptr = sr;
         memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
         ptr += sizeof(net_msg->payload_size);
@@ -24,23 +25,39 @@ char* net_message_serialize(NetMessage* net_msg) {
 }
 
 // Writes a given network message to a socket fd.
-void* net_message_write(int sockfd, NetMessage* net_msg) {
+void* net_message_write(NetMessageOut* net_msg) {
+	struct hostent* he;
+	struct sockaddr_in dest_addr;
+	int sockfd;
+	memset(&dest_addr, sizeof(struct sockaddr_in), 0);
+	if ((he = gethostbyname(net_msg->dest)) == NULL) {
+		fprintf(stderr, "Invalid destination.\n");
+	}
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
+		fprintf(stderr, "socket open error.\n");
+	}
+	dest_addr.sin_family = AF_INET;
+	dest_addr.sin_port = htons(net_msg->port);
+	dest_addr.sin_addr = *((struct in_addr*)he->h_addr);
+	if (connect(sockfd, (struct sockaddr *)&dest_addr, \
+					sizeof(struct sockaddr)) == -1) {
+		fprintf(stderr, "socket connection error.\n");
+	}
 	char* serialized_msg = net_message_serialize(net_msg);
 	size_t serialized_length = sizeof(net_msg->payload_size) + net_msg->payload_size;
 	net_write(sockfd, serialized_msg, serialized_length);
 }
 
 // Read a network message from a given socket fd.
-NetMessage* net_message_read(int sockfd) {
+NetMessageIn* net_message_read(int sockfd) {
 	// Reads length, then read length bytes.
 	size_t length;
 	net_read(sockfd, sizeof(uint32_t), &length);
 	char* payload_buffer = (char*)malloc(length);
 	net_read(sockfd, length, payload_buffer);
-	NetMessage* net_msg = (NetMessage*)malloc(sizeof(NetMessage));
+	NetMessageIn* net_msg = (NetMessageIn*)malloc(sizeof(NetMessageIn));
 	net_msg->payload_size = length;
 	net_msg->payload = payload_buffer;
-	net_msg->status = Ok;
 	return net_msg;
 }
 
@@ -90,8 +107,13 @@ void* net_worker_routine(void* arg) {
 		}
 		// retval != 0, there is a fd in the pollfd that can be used.
 		connfd = accept(sockfd, (struct sockaddr*)&client_addr, &address_len);
-		NetMessage* cli_msg = net_message_read(connfd);
+		NetMessageIn* cli_msg = net_message_read(connfd);
 		queue_insert(context->in_message_queue, cli_msg);
+		while (!queue_is_empty(context->out_message_queue)) {
+			NetMessageOut* out_msg = (NetMessageOut*)queue_pop(context->out_message_queue);
+			net_message_write(out_msg);
+			net_message_out_free(out_msg);
+		}
 	}
 	close(sockfd);
 }
@@ -161,7 +183,12 @@ NetWorker* init_net_worker(int port, size_t prot_preamble) {
 }
 
 
-void net_message_free(NetMessage* net_msg) {
+void net_message_in_free(NetMessageIn* net_msg) {
         free(net_msg->payload);
         free(net_msg);
+}
+
+void net_message_out_free(NetMessageOut* net_msg) {
+	free(net_msg->payload);
+	free(net_msg);
 }
