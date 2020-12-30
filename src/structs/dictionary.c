@@ -4,6 +4,7 @@
 #include "dictionary.h"
 
 unsigned int hash(char* key, size_t max_hash) {
+	fflush(stdout);
 	unsigned int hash_value = 0;
 	for (; *key != '\0'; key++) {
 		hash_value += *key + 31*hash_value;
@@ -28,13 +29,14 @@ void dictionary_insert(Dictionary* dict, char* key, void* value, void (*free_ptr
 	unsigned int hash_value = hash(key, dict->size);
 	DictNode* entry = dict->nodes[hash_value];
 	DictNode* ptr = entry;
-	for(; ptr != NULL && !strcmp(ptr->key, key); ptr = ptr->next);
+	for(; ptr != NULL && strcmp(ptr->key, key); ptr = ptr->next);
 	if (ptr == NULL) {
 		ptr = (DictNode*)malloc(sizeof(DictNode));
 		ptr->next = entry;
 		dict->nodes[hash_value] = ptr;
-		ptr->key = (char*)malloc(strlen(key));
+		ptr->key = (char*)malloc(strlen(key)+1);
 		ptr->free_ptr = free_ptr;
+		fflush(stdout);
 		strcpy(ptr->key, key);
 	}
 	ptr->value = value;
@@ -43,7 +45,7 @@ void dictionary_insert(Dictionary* dict, char* key, void* value, void (*free_ptr
 void* dictionary_get(Dictionary* dict, char* key) {
 	unsigned int hash_value = hash(key, dict->size);
 	DictNode* ptr = dict->nodes[hash_value];
-	for(; ptr != NULL && ! strcmp(ptr->key, key); ptr = ptr->next);
+	for(; ptr != NULL && strcmp(ptr->key, key); ptr = ptr->next);
 	if (ptr == NULL)
 		return NULL;
 	return ptr->value;

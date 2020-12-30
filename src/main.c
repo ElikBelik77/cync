@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "net/net.h"
 #include "structs/dictionary.h"
+#include "conf/conf_parser.h"
 int test_dict() {
 	int blocker;
 	NetWorker* worker = init_net_worker(5,5);
@@ -14,8 +15,13 @@ int test_dict() {
 }
 
 int test_conf() {
+	Dictionary* conf = parse_conf("./configuration.txt");
+	printf("parsing done\n");
+	fflush(stdout);
+//		printf("%s\n", dictionary_get((Dictionary*)dictionary_get(conf, "mynameis"),"eliran"));
+	dictionary_free(conf);
 }
 int main() {
-	test_dict();
+//	test_dict();
 	test_conf();
 }

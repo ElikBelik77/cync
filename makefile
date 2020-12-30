@@ -6,7 +6,7 @@ C_BUILD_PATH = ${subst $(SRC_DIR),$(BUILD_DIR),$(C_SOURCES)}
 OBJS = ${C_BUILD_PATH:.c=.o}
 
 all: clean $(BUILD_DIR)/$(TARGET_EXEC)
-
+	cp configuration.txt ./build/configuration.txt
 $(BUILD_DIR)/$(TARGET_EXEC): ${OBJS}
 	gcc -pthread -o $@ $^
 
