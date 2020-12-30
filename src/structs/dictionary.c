@@ -52,12 +52,16 @@ void* dictionary_get(Dictionary* dict, char* key) {
 }
 
 void dictionary_free(Dictionary* dict) {
+	printf("dict free\n");
+	fflush(stdout);
 	for(int i = 0; i < dict->size; i++) {
 		DictNode* entry = dict->nodes[i];
 		DictNode* ptr = entry;
 		while(entry != NULL) {
 			ptr = entry->next;
 			if (entry->free_ptr != NULL && entry->value != NULL) {
+				printf("free node\n");
+				fflush(stdout);
 				entry->free_ptr(entry->value);
 			}
 			if (entry->key != NULL) {

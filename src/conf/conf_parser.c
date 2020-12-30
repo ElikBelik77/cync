@@ -83,6 +83,7 @@ void parse_node(FILE** f, DictNode* node, bool* is_dict) {
 		Dictionary* nested_dictionary = parse_conf_dict(f);
 		node->key = node_key;
 		node->value = nested_dictionary;
+		free(node_value);
 		*is_dict = 1;
 		file_trim(f);
 		return;
