@@ -1,3 +1,6 @@
 {
-	hello:world
+	hosts: {	
+		home_pc : 127.0.0.1
+		other_pc: ip
+	}
 }

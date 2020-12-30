@@ -6,9 +6,12 @@
 #include "conf_parser.h"
 #include "../structs/dictionary.h"
 Dictionary* parse_conf_dict(FILE** f);
+int iscolon(char c) {
+	return c == ':';
+}
 
 int isascii_modified(char c) {
-	return !isspace(c) && (isalpha(c) || isdigit(c) || c == '{');
+	return !isspace(c) && (isalpha(c) || isdigit(c) || c == '{' || c== '.'|| c=='_');
 }
 void file_skip_parenthesis(FILE** f) {
 	char current;
@@ -44,7 +47,7 @@ void file_read_until(FILE** f, char* buffer, int(*predicate)(char)) {
 		buffer[i] = current;
 		i++;
 	} while(predicate(current));
-	i-=1;
+	i -= 1;
 	buffer[i] = '\0';
 }
 int find_dict_end(FILE** f) {
@@ -72,6 +75,7 @@ void parse_node(FILE** f, DictNode* node, bool* is_dict) {
 	char* node_value = (char*)malloc(line_length);
 	file_trim(f);
 	file_read_until(f, node_key, isascii_modified);
+	fseek(*f, 1L, SEEK_CUR);
 	file_trim(f);
 	file_read_until(f, node_value, isascii_modified);
 	if (node_value[0] == '{') {

@@ -18,7 +18,8 @@ int test_conf() {
 	Dictionary* conf = parse_conf("./configuration.txt");
 	printf("parsing done\n");
 	fflush(stdout);
-//		printf("%s\n", dictionary_get((Dictionary*)dictionary_get(conf, "mynameis"),"eliran"));
+	printf("%s\n", (char*)dictionary_get((Dictionary*)dictionary_get(conf, "hosts"), "other_pc"));
+//	printf("%s\n", dictionary_get(conf, "hosts"));
 	dictionary_free(conf);
 }
 int main() {
