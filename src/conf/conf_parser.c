@@ -6,13 +6,12 @@
 #include "conf_parser.h"
 #include "../structs/dictionary.h"
 Dictionary* parse_conf_dict(FILE** f);
-int iscolon(char c) {
-	return c == ':';
-}
 
+//Predicate function for legal characters to appear on key:value entry in the configuration.
 int isascii_modified(char c) {
 	return !isspace(c) && (isalpha(c) || isdigit(c) || c == '{' || c== '.'|| c=='_');
 }
+//Function that skips closing parenthesis and whitespaces.
 void file_skip_parenthesis(FILE** f) {
 	char current;
 	do {
@@ -20,6 +19,8 @@ void file_skip_parenthesis(FILE** f) {
 	} while (isspace(current) || current == '}');
 	fseek(*f,-1L, SEEK_CUR);
 }
+
+//Function that trims the file from whitespaces.
 void file_trim(FILE** f) {
 	char current;
 	do {
@@ -27,6 +28,8 @@ void file_trim(FILE** f) {
 	} while(isspace(current));
 	fseek(*f, -1L, SEEK_CUR);
 }
+
+//Calculates the current line length.
 int file_line_length(FILE** f) {
 	int current_file_offset = ftell(*f);
 	int count = 0;
@@ -38,6 +41,7 @@ int file_line_length(FILE** f) {
 	fseek(*f, current_file_offset, SEEK_SET);
 	return count;
 }
+//Function that read for the given file into the buffer until the predicate is false.
 void file_read_until(FILE** f, char* buffer, int(*predicate)(char)) {
 	int i = 0;
 	char current;
@@ -50,6 +54,8 @@ void file_read_until(FILE** f, char* buffer, int(*predicate)(char)) {
 	i -= 1;
 	buffer[i] = '\0';
 }
+
+//This function, given a dictionary pointed by f SEEK_CUR, finds the offset of its' closing parenthesis.
 int find_dict_end(FILE** f) {
 	int current_file_offset = ftell(*f);
 	int offset = 0;
@@ -67,7 +73,9 @@ int find_dict_end(FILE** f) {
 	fseek(*f, current_file_offset + 1, SEEK_SET);
 	return offset + current_file_offset-1;
 }
-
+//This function parses a node from the file.
+//	node - the node buffer to fill.
+//	is_dict - if the parsed node is dictionary *is_dict = 1, else 0.
 void parse_node(FILE** f, DictNode* node, bool* is_dict) {
 	file_trim(f);
 	int line_length = file_line_length(f);
@@ -94,12 +102,15 @@ void parse_node(FILE** f, DictNode* node, bool* is_dict) {
 	node->value = node_value;
 	return;
 }
+
+//This function parses a configuration file into a dictionary.
 Dictionary* parse_conf_dict(FILE** f) {
 	Dictionary* result = dictionary_init(100);
 	int dict_end_offset = find_dict_end(f);
 	fflush(stdout);
 	int current_offset;
 	while  ((current_offset = ftell(*f)) < dict_end_offset) {
+		// parse nodes, until the current offset is outside of the dictionary.
 		DictNode* node = (DictNode*)malloc(sizeof(DictNode));
 		bool is_dict;
 		parse_node(f, node, &is_dict);
