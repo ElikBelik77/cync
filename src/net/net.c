@@ -170,7 +170,7 @@ void net_write(int sockfd, void* data, size_t nbytes) {
 // Define windows threading initialization.
 #endif
 
-NetWorker* init_net_worker(int port, size_t prot_preamble) {
+NetWorker* init_net_worker(int port) {
 	NetWorker* worker = (NetWorker*)malloc(sizeof(NetWorker));
 	assert(worker);
 	worker->is_running = 1;

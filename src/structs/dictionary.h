@@ -1,6 +1,7 @@
 #ifndef DICTIONARY_H_
 #define DICTIONARY_H_
 #include <stdbool.h>
+#include <stdlib.h>
 typedef struct DictNode_t {
 	char* key;
 	void* value;

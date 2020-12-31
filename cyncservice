@@ -1,0 +1,28 @@
+#!/bin/sh
+
+case "$1" in
+start)
+	/usr/local/bin/cync &
+	echo $!>/var/run/cync.pid
+	;;
+stop)
+	kill `cat /var/run/cync.pid`
+	rm /var/run/cync.pid
+	;;
+restart)
+	$0 stop
+	$0 start
+	;;
+status)
+	if [ -e /var/run/cync.pid ]; then
+		echo cync is running, pid= `cat /var/run/cync.pid`
+	else
+		echo cync is not running
+		exit 1
+	fi
+	;;
+*)
+	echo "Usage: $0 {start|stop|restart|status}"
+esac
+
+exit 0

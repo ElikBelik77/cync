@@ -60,7 +60,7 @@ typedef struct NetWorker_t {
 /*
 	Initializes a new networker based on the operating system.
 */
-NetWorker* init_net_worker(int port, size_t prot_preamble);
+NetWorker* init_net_worker(int port);
 
 
 /*
