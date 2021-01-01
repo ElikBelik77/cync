@@ -17,9 +17,22 @@ int test_conf() {
 //	printf("%s\n", (char*)dictionary_get(conf, "hosts"));
 	dictionary_free(conf);
 }
+#ifdef TEST
 int main(int argc, char** argv) {
-//	test_dict();
-//	test_conf();
+	printf("[1] testing dictionaries\n");
+	test_dict();
+	printf("[1] test done\n");
+	printf("[2] testing configuration parser\n");
+	test_conf();
+	printf("[2] test done\n");
+}
+#endif
+#ifndef TEST
+int main(int argc, char** argv) {
+	test_dict();
+	test_conf();
+	printf("debug_mode\n");
+	fflush(stdout);
 	Dictionary* conf = parse_conf("./configuration.txt");
 	char* s_port;
 	if ((s_port = dictionary_get(conf, "lport")) == NULL) {
@@ -28,3 +41,4 @@ int main(int argc, char** argv) {
 	}
 	NetWorker* worker = init_net_worker(atoi(s_port));
 }
+#endif
