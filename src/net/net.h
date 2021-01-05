@@ -1,10 +1,12 @@
 #ifndef NET_H_
 #define NET_H_
-#define NET_PORT 1234
 #include <stdbool.h>
 #include <stdint.h>
 #include <netinet/in.h>
-#include "../structs/queue.h"
+
+#include "posix/posix_net.h"
+#include "win32/win32_net.h"
+
 /*
 	Enum for message statuses.
 */
@@ -32,41 +34,10 @@ typedef struct __attribute__((__packed__)) NetMessageOut_t {
 void net_message_in_free(NetMessageIn* message);
 void net_message_out_free(NetMessageOut* message);
 
-#if defined(unix) || defined(__unix__) || defined(__unix)
-#include <pthread.h>
-/*
-	Unix definition of network worker.
-	Holds all the data needed for a background networking pthread.
-*/
-typedef struct NetWorker_t {
-	int sock_fd, port;
-	volatile bool is_running;
-	pthread_t* worker_thread;
-	Queue* in_message_queue;
-	Queue* out_message_queue;
-} NetWorker;
-#endif
-
-#if defined(__WIN32)
-/*
-	Windows definition of network worker.
-*/
-typedef struct NetWorker_t {
-	Queue* in_message_queue;
-	Queue* out_message_queue;
-}
-#endif
-
 /*
 	Initializes a new networker based on the operating system.
 */
 NetWorker* init_net_worker(int port);
-
-
-/*
-	Stops a networker.
-*/
-void net_worker_free(NetWorker* worker);
 
 
 /*

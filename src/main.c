@@ -2,6 +2,8 @@
 #include "net/net.h"
 #include "structs/dictionary.h"
 #include "conf/conf_parser.h"
+#include "debug.h"
+
 int test_dict() {
 	Dictionary* dict = dictionary_init(100);
 	Dictionary* nested = dictionary_init(100);
@@ -27,18 +29,18 @@ int main(int argc, char** argv) {
 	printf("[2] test done\n");
 }
 #endif
+
 #ifndef TEST
 int main(int argc, char** argv) {
 	Dictionary* conf = parse_conf("./configuration.txt");
-	#ifdef DEBUG
-	printf("Configuration:\n");
-	dictionary_print(conf);
-	#endif
+	_debug(printf("Configuration:\n");)
+	_debug(dictionary_print(conf);)
 	char* s_port;
 	if ((s_port = dictionary_get(conf, "lport")) == NULL) {
 		fprintf(stderr, "Invalid configuration setup.\n");
 		exit(0);
 	}
+	dictionary_free(conf);
 	NetWorker* worker = init_net_worker(atoi(s_port));
 	net_worker_free(worker);
 }
