@@ -29,16 +29,17 @@ int main(int argc, char** argv) {
 #endif
 #ifndef TEST
 int main(int argc, char** argv) {
-	test_dict();
-	test_conf();
-	printf("debug_mode\n");
-	fflush(stdout);
 	Dictionary* conf = parse_conf("./configuration.txt");
+	#ifdef DEBUG
+	printf("Configuration:\n");
+	dictionary_print(conf);
+	#endif
 	char* s_port;
 	if ((s_port = dictionary_get(conf, "lport")) == NULL) {
 		fprintf(stderr, "Invalid configuration setup.\n");
 		exit(0);
 	}
 	NetWorker* worker = init_net_worker(atoi(s_port));
+	net_worker_free(worker);
 }
 #endif

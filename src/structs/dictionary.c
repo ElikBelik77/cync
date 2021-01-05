@@ -42,6 +42,18 @@ void dictionary_insert(Dictionary* dict, char* key, void* value, void (*free_ptr
 	ptr->value = value;
 }
 
+void dictionary_print(Dictionary* dict) {
+	DictNode* ptr;
+	for (int i = 0; i < dict->size; i++) {
+		ptr = dict->nodes[i];
+		while (ptr->key != NULL && ptr->next != NULL) {
+			printf("<%s, %p>\n", ptr->key, ptr->value);
+			ptr = ptr->next;
+		}
+	}
+	fflush(stdout);
+}
+
 void* dictionary_get(Dictionary* dict, char* key) {
 	unsigned int hash_value = hash(key, dict->size);
 	DictNode* ptr = dict->nodes[hash_value];

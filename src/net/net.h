@@ -66,7 +66,7 @@ NetWorker* init_net_worker(int port);
 /*
 	Stops a networker.
 */
-void stop_net_worker(NetWorker* worker);
+void net_worker_free(NetWorker* worker);
 
 
 /*
