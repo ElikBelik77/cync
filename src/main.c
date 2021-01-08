@@ -2,6 +2,7 @@
 //net must come before stdio.h for windows compactability.
 #include <stdio.h>
 #include <getopt.h>
+#include <string.h>
 
 #include "structs/dictionary.h"
 #include "conf/conf_parser.h"
@@ -68,9 +69,19 @@ Options* parse_options(Dictionary* conf, int argc, char** argv) {
 	Options* opts = (Options*)malloc(sizeof(Options));
 	opts->src_file = src_file;
 	opts->dest_host = dest_host;
-	_debug(printf("source file: %s\n", opts->src_file);)
-	_debug(printf("destination host: %s\n", opts->dest_host);)
+	_debug(printf("[D] source file: %s\n", opts->src_file);)
+	_debug(printf("[D] destination host: %s\n", opts->dest_host);)
 	return opts;
+}
+void send_options(NetWorker* worker, Options* opts) {
+	NetMessageOut* msg = (NetMessageOut*)malloc(sizeof(NetMessageOut));
+	msg->payload = strdup(opts->src_file);
+	msg->payload_size = strlen(opts->src_file);
+	msg->port = worker->port;
+	msg->dest = opts->dest_host;
+	queue_insert(worker->out_message_queue, msg);
+	char b;
+	scanf("%c",&b);
 }
 int main(int argc, char** argv) {
 	Dictionary* conf = parse_conf("./configuration.txt");
@@ -83,7 +94,7 @@ int main(int argc, char** argv) {
 	}
 	NetWorker* worker = init_net_worker(atoi(s_port));
 	Options* opts = parse_options(conf, argc, argv);
-	
+	send_options(worker, opts);
 	net_worker_free(worker);
 	dictionary_free(conf);
 	free(opts);

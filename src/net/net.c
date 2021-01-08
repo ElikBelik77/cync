@@ -22,6 +22,7 @@ NetWorker* init_net_worker(int port) {
         worker->is_running = 1;
         worker->in_message_queue  = queue_create();
         worker->out_message_queue = queue_create();
+	printf("%p\n",worker->out_message_queue);	
 	worker->port = port;
         // Initialize threading, the appropriate function appears i$        // according to the OS.
 //      worker->worker_thread = init_threading(worker);
