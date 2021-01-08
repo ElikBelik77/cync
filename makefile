@@ -4,17 +4,18 @@ TARGET_EXEC ?= cync
 C_SOURCES := $(shell find $(SRC_DIR) -name *.c)
 C_BUILD_PATH = ${subst $(SRC_DIR),$(BUILD_DIR),$(C_SOURCES)}
 OBJS = ${C_BUILD_PATH:.c=.o}
+CCFLAGS := -g
+ifeq ($(OS), UNIX)
+	CCFLAGS += -DUNIX -pthread
+endif
+ifeq ($(OS), WIN32)
+	CCFLAGS += -DWIN32 -lws2_32
+endif
 
-unix: CCFLAGS := -DUNIX -g -pthread
-unix: all
-
-win: CCFLAGS := -DWIN32 -g -lws2_32
-win: all
-
-debug: CCFLAGS := -DDEBUG -g
+debug: CCFLAGS += -DDEBUG
 debug: all
 
-test: CCFLAGS := -DTEST -g
+test: CCFLAGS += -DTEST
 test: all
 
 all: clean $(BUILD_DIR)/$(TARGET_EXEC)

@@ -1,6 +1,6 @@
 #include "net/net.h"
+//net must come before stdio.h for windows compactability.
 #include <stdio.h>
-//#include "net/net.h"
 #include "structs/dictionary.h"
 #include "conf/conf_parser.h"
 #include "debug.h"
@@ -16,8 +16,7 @@ int test_dict() {
 
 int test_conf() {
 	Dictionary* conf = parse_conf("./configuration.txt");
-	printf("%p\n", (char*)dictionary_get((Dictionary*)dictionary_get(conf, "hosts"),"other_p"));
-//	printf("%s\n", (char*)dictionary_get(conf, "hosts"));
+	dictionary_print(conf);
 	dictionary_free(conf);
 }
 #ifdef TEST
@@ -32,6 +31,7 @@ int main(int argc, char** argv) {
 #endif
 
 #ifndef TEST
+
 int main(int argc, char** argv) {
 	Dictionary* conf = parse_conf("./configuration.txt");
 	_debug(printf("Configuration:\n");)
@@ -42,7 +42,9 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 	dictionary_free(conf);
+	printf("%s",s_port);
 	NetWorker* worker = init_net_worker(atoi(s_port));
 	net_worker_free(worker);
 }
+
 #endif
