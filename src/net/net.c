@@ -1,9 +1,18 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "net.h"
 #include "posix/posix_net.h"
 #include "win32/win32_net.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+
+char* net_message_serialize(NetMessageOut* net_msg) {
+        char* sr = malloc(sizeof(net_msg->payload_size) + net_msg->payload_size);
+        char* ptr = sr;
+        memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
+        ptr += sizeof(net_msg->payload_size);
+        memcpy(ptr, net_msg->payload, net_msg->payload_size);
+        return sr;
+}
 
 NetWorker* init_net_worker(int port) {
         NetWorker* worker = (NetWorker*)malloc(sizeof(NetWorker));
@@ -18,6 +27,7 @@ NetWorker* init_net_worker(int port) {
         init_threading(worker);
         return worker;
 }
+
 
 
 void net_message_in_free(NetMessageIn* net_msg) {

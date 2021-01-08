@@ -15,22 +15,11 @@
 #include "../net.h"
 #include "../../structs/queue.h"
 
-//Function that guarentee reading/writing of nbytes, otherwise throws an error.
 void net_read(int sockfd, size_t nbytes, void* buffer);
-void net_write(int sockfd, void* data, size_t nbytes);
-
-// Serializes a netmessage into char* (byte array).
-char* net_message_serialize(NetMessageOut* net_msg) {
-        char* sr = malloc(sizeof(net_msg->payload_size) + net_msg->payload_size);
-        char* ptr = sr;
-        memcpy(ptr, &(net_msg->payload_size), sizeof(net_msg->payload_size));
-        ptr += sizeof(net_msg->payload_size);
-        memcpy(ptr, net_msg->payload, net_msg->payload_size);
-        return sr;
-}
+void net_write(int sockfd, size_t nbytes, void* buffer);
 
 // Writes a given network message to a socket fd.
-void* net_message_write(NetMessageOut* net_msg) {
+void net_message_write(NetMessageOut* net_msg) {
 	struct hostent* he;
 	struct sockaddr_in dest_addr;
 	int sockfd;
@@ -43,7 +32,7 @@ void* net_message_write(NetMessageOut* net_msg) {
 	}
 	dest_addr.sin_family = AF_INET;
 	dest_addr.sin_port = htons(net_msg->port);
-	dest_addr.sin_addr = *((struct in_addr*)he->h_addr);
+	dest_addr.sin_addr.s_addr = inet_addr(net_msg->dest);
 	if (connect(sockfd, (struct sockaddr *)&dest_addr, \
 					sizeof(struct sockaddr)) == -1) {
 		fprintf(stderr, "socket connection error.\n");
@@ -51,6 +40,7 @@ void* net_message_write(NetMessageOut* net_msg) {
 	char* serialized_msg = net_message_serialize(net_msg);
 	size_t serialized_length = sizeof(net_msg->payload_size) + net_msg->payload_size;
 	net_write(sockfd, serialized_msg, serialized_length);
+	close(sockfd);
 }
 
 // Read a network message from a given socket fd.
@@ -86,13 +76,15 @@ int init_net_server(NetWorker* worker) {
 	if ((listen(sockfd, 5)) != 0) {
 		fprintf(stderr, "socket listen failed.\n");
 	}
+  worker->sock_fd = sockfd;
 	return sockfd;
 }
 
+
 void* net_worker_routine(void* arg) {
-	NetWorker* context = (NetWorker*)arg;
-        int connfd, sockfd = init_net_server(context);
-	int address_len;
+  NetWorker* context = (NetWorker*)arg;
+  int connfd, sockfd = init_net_server(context);
+  int address_len;
 	struct sockaddr_in client_addr;
 	// Setup a pollfd struct for timeout polling.
 	struct pollfd pollst;
@@ -117,6 +109,7 @@ void* net_worker_routine(void* arg) {
 		}
 	}
 	close(sockfd);
+	return NULL;
 }
 
 void init_threading(NetWorker* worker) {

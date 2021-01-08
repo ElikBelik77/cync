@@ -1,11 +1,10 @@
 #ifndef NET_H_
-#define NET_H_
 #include <stdbool.h>
 #include <stdint.h>
-#include <netinet/in.h>
 
 #include "posix/posix_net.h"
 #include "win32/win32_net.h"
+#define NET_H_
 
 /*
 	Enum for message statuses.
@@ -33,7 +32,7 @@ typedef struct __attribute__((__packed__)) NetMessageOut_t {
 */
 void net_message_in_free(NetMessageIn* message);
 void net_message_out_free(NetMessageOut* message);
-
+char* net_message_serialize(NetMessageOut* message);
 /*
 	Initializes a new networker based on the operating system.
 */
@@ -44,4 +43,6 @@ NetWorker* init_net_worker(int port);
 	Frees a networker.
 */
 void net_worker_free(NetWorker* worker);
+
+
 #endif

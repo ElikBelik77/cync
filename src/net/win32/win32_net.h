@@ -2,11 +2,16 @@
 #ifndef WIN32_NET_H_
 #define WIN32_NET_H_
 
+#include <winsock2.h>
+//#pragma comment(lib, "ws2_32")
+
 #include <windows.h>
+
 
 #include "../../structs/queue.h"
 typedef struct NetWorker_t {
-	int sock_fd, port;
+  int port;
+	SOCKET sock;
 	volatile bool is_running;
 	DWORD worker_thread_id;
 	HANDLE worker_thread_handle;
