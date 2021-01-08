@@ -41,10 +41,9 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "Invalid configuration setup.\n");
 		exit(0);
 	}
-	dictionary_free(conf);
-	printf("%s",s_port);
 	NetWorker* worker = init_net_worker(atoi(s_port));
 	net_worker_free(worker);
+	dictionary_free(conf);
 }
 
 #endif

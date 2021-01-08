@@ -117,8 +117,9 @@ Dictionary* parse_conf_dict(FILE** f) {
 		if (is_dict) {
 			dictionary_insert(result, node->key, node->value, (void(*)(void*))dictionary_free);
 		}
-		else
+		else {
 			dictionary_insert(result, node->key, node->value, free);
+		}
 		free(node->key);
 		free(node);
 		file_skip_parenthesis(f);
