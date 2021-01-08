@@ -5,11 +5,14 @@ C_SOURCES := $(shell find $(SRC_DIR) -name *.c)
 C_BUILD_PATH = ${subst $(SRC_DIR),$(BUILD_DIR),$(C_SOURCES)}
 OBJS = ${C_BUILD_PATH:.c=.o}
 
+unix: CCFLAGS := -DUNIX =g
+unix: all
+
+win: CCFLAGS := -DWIN32 -g
+win: all
+
 debug: CCFLAGS := -DDEBUG -g
 debug: all
-
-release: CCFLAGS := -DRELEASE -g
-release: all
 
 test: CCFLAGS := -DTEST -g
 test: all
@@ -24,6 +27,6 @@ $(BUILD_DIR)/%.o: ${SRC_DIR}/%.c
 	$(MKDIR_P) $(dir $@)
 	$(CC) $(CCFLAGS) -c $< -o $@
 clean:
-	rm -rf build	
+	rm -rf build
 
 MKDIR_P := mkdir -p

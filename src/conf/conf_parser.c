@@ -126,7 +126,7 @@ Dictionary* parse_conf_dict(FILE** f) {
 	return result;
 
 }
-#if defined(unix) || defined(__unix__) || defined(__unix)
+
 Dictionary* parse_conf(char* path) {
 	FILE *f = fopen(path, "rb");
 	if (!f) {
@@ -137,12 +137,3 @@ Dictionary* parse_conf(char* path) {
 	fclose(f);
 	return conf_dict;
 }
-
-#endif
-
-#if defined(WIN32)
-Dictionary* parse_conf(char* path) {
-	return NULL;
-}
-
-#endif

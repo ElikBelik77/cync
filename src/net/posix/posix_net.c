@@ -1,3 +1,4 @@
+#ifdef UNIX
 #include <assert.h>
 #include <stdio.h>
 #include <netinet/in.h>
@@ -162,3 +163,5 @@ void net_write(int sockfd, void* data, size_t nbytes) {
                 }
         }
 }
+
+#endif

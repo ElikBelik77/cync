@@ -1,9 +1,10 @@
-#if defined(WIN32)
+#ifdef WIN32
 #ifndef WIN32_NET_H_
 #define WIN32_NET_H_
 
 #include <windows.h>
 
+#include "../../structs/queue.h"
 typedef struct NetWorker_t {
 	int sock_fd, port;
 	volatile bool is_running;

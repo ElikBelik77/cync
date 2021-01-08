@@ -1,4 +1,4 @@
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#ifdef UNIX
 #ifndef POSIX_NET_H_
 #define POSIX_NET_H_
 
