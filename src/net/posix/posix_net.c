@@ -10,6 +10,7 @@
 #include <poll.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #include "posix_net.h"
 #include "../net.h"
@@ -39,7 +40,7 @@ void net_message_write(NetMessageOut* net_msg) {
 	}
 	char* serialized_msg = net_message_serialize(net_msg);
 	size_t serialized_length = sizeof(net_msg->payload_size) + net_msg->payload_size;
-	net_write(sockfd, serialized_msg, serialized_length);
+	net_write(sockfd, serialized_length, serialized_msg);
 	close(sockfd);
 }
 
@@ -145,7 +146,7 @@ void net_read(int sockfd, size_t nbytes, void* buffer) {
 
 }
 
-void net_write(int sockfd, void* data, size_t nbytes) {
+void net_write(int sockfd, size_t nbytes, void* data) {
         int bytes_sent = 0;
         int result;
         while(bytes_sent < nbytes) {

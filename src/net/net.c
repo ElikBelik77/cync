@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <string.h>
 char* net_message_serialize(NetMessageOut* net_msg) {
         char* sr = malloc(sizeof(net_msg->payload_size) + net_msg->payload_size);
         char* ptr = sr;
