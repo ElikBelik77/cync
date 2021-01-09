@@ -7,8 +7,11 @@
 
 #include <windows.h>
 
-
 #include "../../structs/queue.h"
+
+/*
+	Strcut for NetWorker objects.
+*/
 typedef struct NetWorker_t {
   int port;
 	SOCKET sock;
@@ -18,6 +21,7 @@ typedef struct NetWorker_t {
 	Queue* in_message_queue;
 	Queue* out_message_queue;
 } NetWorker;
+
 
 void init_threading(NetWorker* worker);
 

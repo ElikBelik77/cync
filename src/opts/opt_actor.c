@@ -38,6 +38,7 @@ Options* parse_options(Dictionary* conf, int argc, char** argv) {
 	_debug(printf("[D] source file: %s\n", opts->source_file);)
 	_debug(printf("[D] destination host: %s\n", opts->dest_host);)
 }
+
 void transfer_file(NetWorker* net_worker, Options* opts) {
 	FILE *f = fopen(opts->source_file, "rb");
 	fseek(f, 0, SEEK_END);
@@ -46,6 +47,7 @@ void transfer_file(NetWorker* net_worker, Options* opts) {
 	char *data = malloc(fsize);
 	fread(data, 1, fsize, f);
 	fclose(f);
+
 	NetMessageOut* msg = (NetMessageOut*)malloc(sizeof(NetMessageOut));
 	msg->payload = data;
 	msg->payload_size = (uint32_t)fsize;

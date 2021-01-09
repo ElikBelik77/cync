@@ -13,13 +13,17 @@ typedef enum Status_e { Failed = 0, Ok = 1} Status;
 
 
 /*
-	Struct for describing network messages. It is packed for compiler-independent parsing.
+	Struct for describing inbound network messages. It is packed for compiler-independent parsing.
 */
 typedef struct __attribute__((__packed__)) NetMessageIn_t {
 	uint32_t payload_size;
 	char* payload;
 } NetMessageIn;
 
+
+/*
+	Strcut for outbound network messages.
+*/
 typedef struct __attribute__((__packed__)) NetMessageOut_t {
 	uint32_t payload_size;
 	char* payload;
@@ -31,7 +35,11 @@ typedef struct __attribute__((__packed__)) NetMessageOut_t {
 	Frees a network message.
 */
 void net_message_in_free(NetMessageIn* message);
-void net_message_out_free(NetMessageOut* message);
+void net_message_out_free(NetMessageOut* mess0age);
+
+/*
+	Serializes a network message.
+*/
 char* net_message_serialize(NetMessageOut* message);
 /*
 	Initializes a new networker based on the operating system.

@@ -6,6 +6,9 @@
 
 #include "../../structs/queue.h"
 
+/*
+	Struct for NetWorker objects.
+*/
 typedef struct NetWorker_t {
 	int sock_fd, port;
 	volatile bool is_running;

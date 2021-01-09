@@ -7,6 +7,7 @@
 void net_read(SOCKET sock, size_t nbytes, void* buffer);
 void net_write(SOCKET sock, size_t nbytes, void* buffer);
 
+// Uses select to check sock for clients.
 int recv_timeout_tcp(SOCKET socket, long sec, long usec) {
   struct __ms_timeval timeout;
   struct fd_set fds;
@@ -17,6 +18,7 @@ int recv_timeout_tcp(SOCKET socket, long sec, long usec) {
   return select(0, &fds, 0, 0, &timeout);
 }
 
+// Reads a net message from a sock.
 NetMessageIn* net_message_read(SOCKET sock) {
   size_t length;
   net_read(sock, sizeof(uint32_t), &length);
@@ -28,6 +30,7 @@ NetMessageIn* net_message_read(SOCKET sock) {
   return net_msg;
 }
 
+// Writes a net message to a sock.
 void net_message_write(NetMessageOut* net_msg) {
   SOCKET s;
   struct sockaddr_in dest_addr;
@@ -50,6 +53,7 @@ void net_message_write(NetMessageOut* net_msg) {
   closesocket(s);
 }
 
+// Initializes a tcp socket server.
 SOCKET init_net_server(NetWorker* context) {
   WSADATA wsa;
   SOCKET s;
@@ -89,6 +93,7 @@ SOCKET init_net_server(NetWorker* context) {
   return s;
 }
 
+// Net worker routine, accept clients and read messages forever.
 DWORD WINAPI net_worker_routine(LPVOID lpParam) {
   NetWorker* context = (NetWorker*)lpParam;
 
