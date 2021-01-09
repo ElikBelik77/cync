@@ -6,6 +6,7 @@
 
 #include "structs/dictionary.h"
 #include "conf/conf_parser.h"
+#include "opts/opt_actor.h"
 #include "debug.h"
 
 int test_dict() {
@@ -34,54 +35,14 @@ int main(int argc, char** argv) {
 #endif
 
 #ifndef TEST
-typedef struct Options_t {
-	char* src_file;
-	char* dest_host;
-} Options;
-Options* parse_options(Dictionary* conf, int argc, char** argv) {
-	char* src_file = NULL;
-	char* dest_host = (char*)dictionary_get(((Dictionary*)dictionary_get(conf, "hosts")),"default");
-	int c;
-	while (1) {
-		c = getopt(argc, argv, "f:h:");
-		/* Detect the end of the options. */
-		if (c == -1)
-			break;
-		switch (c) {
-			case 'f':
-				src_file = optarg;
-				break;
 
-			case 'h':
-				dest_host = \
-				(char*)dictionary_get(((Dictionary*)\
-				dictionary_get(conf, "hosts")),\
-				optarg);
-			case '?':
-				break;
-		        default:
-				fprintf(stderr, "Usage: %s"\
-				" [-f/--file file_path]"\
-				" [-h/--host host_name]", argv[0]);
-				exit(0);
-		}
-	}
-	Options* opts = (Options*)malloc(sizeof(Options));
-	opts->src_file = src_file;
-	opts->dest_host = dest_host;
-	_debug(printf("[D] source file: %s\n", opts->src_file);)
-	_debug(printf("[D] destination host: %s\n", opts->dest_host);)
-	return opts;
-}
 void send_options(NetWorker* worker, Options* opts) {
 	NetMessageOut* msg = (NetMessageOut*)malloc(sizeof(NetMessageOut));
-	msg->payload = strdup(opts->src_file);
-	msg->payload_size = strlen(opts->src_file);
+	msg->payload = strdup(opts->source_file);
+	msg->payload_size = strlen(opts->source_file);
 	msg->port = worker->port;
 	msg->dest = opts->dest_host;
 	queue_insert(worker->out_message_queue, msg);
-	char b;
-	scanf("%c",&b);
 }
 int main(int argc, char** argv) {
 	Dictionary* conf = parse_conf("./configuration.txt");
@@ -94,7 +55,8 @@ int main(int argc, char** argv) {
 	}
 	NetWorker* worker = init_net_worker(atoi(s_port));
 	Options* opts = parse_options(conf, argc, argv);
-	send_options(worker, opts);
+	act(worker, opts);
+	free(opts);
 	net_worker_free(worker);
 	dictionary_free(conf);
 	free(opts);
