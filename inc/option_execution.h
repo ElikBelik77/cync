@@ -3,24 +3,24 @@
 #define OPTACTOR_H_
 #include <stdbool.h>
 
-#include "structs/dictionary.h"
 #include "net/net.h"
+#include "structs/dictionary.h"
 /*
-	Struct for holding cli program arguments.
+        Struct for holding cli program arguments.
 */
 typedef struct Options_t {
-	char* source_file;
-	char* dest_host;
-	bool transfer;
+  char *source_file;
+  char *dest_host;
+  bool transfer;
 } Options;
 
 /*
-	This function parsses given cli arguments into Options_t struct.
+        This function parsses given cli arguments into Options_t struct.
 */
-Options* parse_options(Dictionary* conf, int argc, char** argv);
+Options *parse_options(Dictionary *conf, int argc, char **argv);
 
 /*
-	This function act according to options.
+        This function act according to options.
 */
-void act(NetWorker* net_worker, Options* opt);
+void act(NetWorker *net_worker, Options *opt);
 #endif

@@ -4,9 +4,9 @@
 #include "structs/dictionary.h"
 
 /*
-	This function parses a configuration file into a dictionary.
-		path - the path to the configuration file.
+        This function parses a configuration file into a dictionary.
+                path - the path to the configuration file.
 */
-Dictionary* parse_conf(char* path);
+Dictionary *parse_conf(char *path);
 
 #endif
