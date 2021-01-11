@@ -4,12 +4,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "opt_actor.h"
-#include "../structs/dictionary.h"
-#include "../debug.h"
+#include "option_execution.h"
+#include "common.h"
+
 Options* parse_options(Dictionary* conf, int argc, char** argv) {
 	Options* opts = (Options*)malloc(sizeof(Options));
-	memset(opts, sizeof(Options), 0);
+	memset(opts, 0, sizeof(Options));
 	opts->dest_host = (char*)dictionary_get(((Dictionary*)dictionary_get(conf, "hosts")), "default");
 	int c;
 	while (1) {
@@ -37,10 +37,15 @@ Options* parse_options(Dictionary* conf, int argc, char** argv) {
 	}
 	_debug(printf("[D] source file: %s\n", opts->source_file);)
 	_debug(printf("[D] destination host: %s\n", opts->dest_host);)
+	return opts;
 }
 
 void transfer_file(NetWorker* net_worker, Options* opts) {
 	FILE *f = fopen(opts->source_file, "rb");
+	if (f == NULL) {
+		printf("error\n");
+		fflush(stdout);
+	}
 	fseek(f, 0, SEEK_END);
 	long fsize = ftell(f);
 	fseek(f, 0, SEEK_SET);  /* same as rewind(f); */

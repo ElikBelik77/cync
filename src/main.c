@@ -5,9 +5,9 @@
 #include <string.h>
 
 #include "structs/dictionary.h"
-#include "conf/conf_parser.h"
-#include "opts/opt_actor.h"
-#include "debug.h"
+#include "configuration_parse.h"
+#include "option_execution.h"
+#include "common.h"
 
 int test_dict() {
 	Dictionary* dict = dictionary_init(100);
@@ -36,14 +36,7 @@ int main(int argc, char** argv) {
 
 #ifndef TEST
 
-void send_options(NetWorker* worker, Options* opts) {
-	NetMessageOut* msg = (NetMessageOut*)malloc(sizeof(NetMessageOut));
-	msg->payload = strdup(opts->source_file);
-	msg->payload_size = strlen(opts->source_file);
-	msg->port = worker->port;
-	msg->dest = opts->dest_host;
-	queue_insert(worker->out_message_queue, msg);
-}
+
 int main(int argc, char** argv) {
 	Dictionary* conf = parse_conf("./configuration.txt");
 	_debug(printf("Configuration:\n");)
@@ -59,7 +52,6 @@ int main(int argc, char** argv) {
 	free(opts);
 	net_worker_free(worker);
 	dictionary_free(conf);
-	free(opts);
 }
 
 #endif

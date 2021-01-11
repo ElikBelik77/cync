@@ -1,3 +1,4 @@
+#pragma once
 #ifdef WIN32
 #ifndef WIN32_NET_H_
 #define WIN32_NET_H_
@@ -7,7 +8,7 @@
 
 #include <windows.h>
 
-#include "../../structs/queue.h"
+#include "structs/queue.h"
 
 /*
 	Strcut for NetWorker objects.

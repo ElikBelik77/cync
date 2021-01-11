@@ -1,7 +1,7 @@
 #ifdef WIN32
-#include "../net.h"
-#include "../../debug.h"
-#include "win32_net.h"
+#include "net/net.h"
+#include "common.h"
+#include "net/win32/win32_net.h"
 
 #include <stdio.h>
 void net_read(SOCKET sock, size_t nbytes, void* buffer);
@@ -164,3 +164,4 @@ void net_write(SOCKET sock, size_t nbytes, void* buffer) {
   }
 }
 #endif
+typedef int ISO_EMPTY_WIN_CHECK;

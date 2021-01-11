@@ -12,19 +12,19 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#include "posix_net.h"
-#include "../net.h"
-#include "../../structs/queue.h"
-#include "../../debug.h"
+#include "net/posix/posix_net.h"
+#include "net/net.h"
+#include "structs/queue.h"
+#include "common.h"
 
-void net_read(int sockfd, uint32_t nbytes, void* buffer);
-void net_write(int sockfd, uint32_t nbytes, void* buffer);
+void net_read(int sockfd, uint32_t nbytes, char* buffer);
+void net_write(int sockfd, uint32_t nbytes, char* buffer);
 
 // Writes a given network message to a socket fd.
 void net_message_write(NetMessageOut* net_msg) {
 	struct sockaddr_in dest_addr;
 	int sockfd;
-	memset(&dest_addr, sizeof(struct sockaddr_in), 0);
+	memset(&dest_addr, 0, sizeof(struct sockaddr_in));
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
 		fprintf(stderr, "socket open error.\n");
 		return;
@@ -48,7 +48,7 @@ void net_message_write(NetMessageOut* net_msg) {
 NetMessageIn* net_message_read(int sockfd) {
 	// Reads length, then read length bytes.
 	uint32_t length;
-	net_read(sockfd, sizeof(uint32_t), &length);
+	net_read(sockfd, sizeof(uint32_t), (char*)&length);
 	char* payload_buffer = (char*)malloc(length+1);
 	net_read(sockfd, length, payload_buffer);
 	NetMessageIn* net_msg = (NetMessageIn*)malloc(sizeof(NetMessageIn));
@@ -101,11 +101,11 @@ void* net_worker_routine(void* arg) {
 	int connfd, sockfd = init_net_server(context);
 	pthread_t* sender_thread = (pthread_t*)malloc(sizeof(pthread_t));
 	pthread_create(sender_thread, NULL, net_sender_routine, (void*)context);
-	int address_len = 0;
+	unsigned int address_len = 0;
 	struct sockaddr_in client_addr;
 	// Setup a pollfd struct for timeout polling.
 	struct pollfd pollst;
-	memset(&pollst, sizeof(struct pollfd), 0);
+	memset(&pollst, 0, sizeof(struct pollfd));
 	pollst.fd = sockfd;
 	pollst.events = POLLIN | POLLPRI;
 	while(context->is_running) {
@@ -116,7 +116,7 @@ void* net_worker_routine(void* arg) {
 			// to halt upon a stop request.
 		}
 		address_len = 0;
-		memset(&client_addr, sizeof(client_addr), 0);
+		memset(&client_addr, 0, sizeof(client_addr));
 		connfd = accept(sockfd, (struct sockaddr*)&client_addr, &address_len);
 		NetMessageIn* cli_msg = net_message_read(connfd);
 		queue_insert(context->in_message_queue, cli_msg);
@@ -150,7 +150,7 @@ void net_worker_free(NetWorker* worker) {
 		free(worker);
 }
 
-void net_read(int sockfd, uint32_t nbytes, void* buffer) {
+void net_read(int sockfd, uint32_t nbytes, char* buffer) {
         uint32_t bytes_read = 0;
         int result;
         while (bytes_read < nbytes) {
@@ -164,7 +164,7 @@ void net_read(int sockfd, uint32_t nbytes, void* buffer) {
 
 }
 
-void net_write(int sockfd, uint32_t nbytes, void* data) {
+void net_write(int sockfd, uint32_t nbytes, char* data) {
         uint32_t bytes_sent = 0;
         int result;
         while(bytes_sent < nbytes) {
@@ -178,3 +178,4 @@ void net_write(int sockfd, uint32_t nbytes, void* data) {
 }
 
 #endif
+typedef int ISO_EMPTY_POSIX_CHECK;

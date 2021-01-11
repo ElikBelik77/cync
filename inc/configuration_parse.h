@@ -1,6 +1,7 @@
-#ifndef CONF_PARSER_H_
-#define CONF_PARSER_H_
-#include "../structs/dictionary.h"
+#pragma once
+#ifndef CONFIGURATION_PARSE_H_
+#define CONFIGURATION_PARSE_H_
+#include "structs/dictionary.h"
 
 /*
 	This function parses a configuration file into a dictionary.

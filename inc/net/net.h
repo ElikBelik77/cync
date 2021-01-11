@@ -1,9 +1,10 @@
+#pragma once
 #ifndef NET_H_
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "posix/posix_net.h"
-#include "win32/win32_net.h"
+#include "net/posix/posix_net.h"
+#include "net/win32/win32_net.h"
 #define NET_H_
 
 /*

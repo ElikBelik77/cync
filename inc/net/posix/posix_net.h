@@ -1,10 +1,11 @@
+#pragma once
 #ifdef UNIX
 #ifndef POSIX_NET_H_
 #define POSIX_NET_H_
 
 #include <pthread.h>
 
-#include "../../structs/queue.h"
+#include "structs/queue.h"
 
 /*
 	Struct for NetWorker objects.

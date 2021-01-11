@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "dlinkedlist.h"
+#include "structs/dlinkedlist.h"
 
 DLinkedList* dlist_create() {
 	DLinkedList* dlist = (DLinkedList*)malloc(sizeof(DLinkedList));

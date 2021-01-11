@@ -1,10 +1,11 @@
-#include "net.h"
-#include "posix/posix_net.h"
-#include "win32/win32_net.h"
+#include "net/net.h"
+#include "net/posix/posix_net.h"
+#include "net/win32/win32_net.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 char* net_message_serialize(NetMessageOut* net_msg) {
         char* sr = malloc(sizeof(net_msg->payload_size) + net_msg->payload_size);
         char* ptr = sr;
@@ -15,19 +16,18 @@ char* net_message_serialize(NetMessageOut* net_msg) {
 }
 
 NetWorker* init_net_worker(int port) {
-        NetWorker* worker = (NetWorker*)malloc(sizeof(NetWorker));
-        if (worker == NULL) {
+    NetWorker* worker = (NetWorker*)malloc(sizeof(NetWorker));
+    if (worker == NULL) {
 		fprintf(stderr, "malloc error.\n");
 	}
-        worker->is_running = 1;
-        worker->in_message_queue  = queue_create();
-        worker->out_message_queue = queue_create();
-	printf("%p\n",worker->out_message_queue);	
+    worker->is_running = 1;
+	worker->in_message_queue  = queue_create();
+	worker->out_message_queue = queue_create();
 	worker->port = port;
-        // Initialize threading, the appropriate function appears i$        // according to the OS.
-//      worker->worker_thread = init_threading(worker);
-        init_threading(worker);
-        return worker;
+//	Initialize threading, the appropriate function appears i$        // according to the OS.
+//	worker->worker_thread = init_threading(worker);
+    init_threading(worker);
+	return worker;
 }
 
 

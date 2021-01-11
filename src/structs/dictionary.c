@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "dictionary.h"
+#include "structs/dictionary.h"
 
 unsigned int hash(char* key, size_t max_hash) {
 	fflush(stdout);

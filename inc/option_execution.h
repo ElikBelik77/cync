@@ -1,7 +1,8 @@
+#pragma once
 #ifndef OPTACTOR_H_
 #define OPTACTOR_H_
-#include "../structs/dictionary.h"
-#include "../net/net.h"
+#include "structs/dictionary.h"
+#include "net/net.h"
 /*
 	Struct for holding cli program arguments.
 */

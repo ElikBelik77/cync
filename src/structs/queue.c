@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "queue.h"
-#include "dlinkedlist.h"
+#include "structs/queue.h"
+
 Queue* queue_create() {
 	Queue* queue = (Queue*)malloc(sizeof(Queue));
 	DLinkedList* dl = dlist_create();

@@ -1,10 +1,12 @@
 SRC_DIR ?= ./src
+INC_DIR ?= ./inc
 BUILD_DIR ?= ./build
 TARGET_EXEC ?= cync
 C_SOURCES := $(shell find $(SRC_DIR) -name *.c)
+HEADERS := $(shell find $(INC_DIR) -name *.h)
 C_BUILD_PATH = ${subst $(SRC_DIR),$(BUILD_DIR),$(C_SOURCES)}
 OBJS = ${C_BUILD_PATH:.c=.o}
-CCFLAGS := -g
+CCFLAGS ?= -g -pedantic -I $(INC_DIR)
 ifeq ($(OS), UNIX)
 	CCFLAGS += -DUNIX -pthread
 endif
@@ -26,8 +28,9 @@ $(BUILD_DIR)/$(TARGET_EXEC): ${OBJS}
 
 $(BUILD_DIR)/%.o: ${SRC_DIR}/%.c
 	$(MKDIR_P) $(dir $@)
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(CCFLAGS) -c $^ -o $@
 clean:
 	rm -rf build
+	find . -name *.save | xargs rm -f
 
 MKDIR_P := mkdir -p

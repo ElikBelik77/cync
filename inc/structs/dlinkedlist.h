@@ -1,3 +1,4 @@
+#pragma once
 #ifndef DLINKED_LIST_
 #define DLINKED_LIST_
 typedef struct DLinkedList_t {

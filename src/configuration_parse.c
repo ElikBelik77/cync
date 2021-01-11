@@ -3,51 +3,52 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#include "conf_parser.h"
-#include "../structs/dictionary.h"
-Dictionary* parse_conf_dict(FILE** f);
+
+#include "configuration_parse.h"
+
+Dictionary* parse_conf_dict(FILE* f);
 
 //Predicate function for legal characters to appear on key:value entry in the configuration.
 int isascii_modified(char c) {
 	return !isspace(c) && (isalpha(c) || isdigit(c) || c == '{' || c== '.'|| c=='_');
 }
 //Function that skips closing parenthesis and whitespaces.
-void file_skip_parenthesis(FILE** f) {
+void file_skip_parenthesis(FILE* f) {
 	char current;
 	do {
-		current = fgetc(*f);
+		current = fgetc(f);
 	} while (isspace(current) || current == '}');
-	fseek(*f,-1L, SEEK_CUR);
+	fseek(f,-1L, SEEK_CUR);
 }
 
 //Function that trims the file from whitespaces.
-void file_trim(FILE** f) {
+void file_trim(FILE* f) {
 	char current;
 	do {
-		current = fgetc(*f);
+		current = fgetc(f);
 	} while(isspace(current));
-	fseek(*f, -1L, SEEK_CUR);
+	fseek(f, -1L, SEEK_CUR);
 }
 
 //Calculates the current line length.
-int file_line_length(FILE** f) {
-	int current_file_offset = ftell(*f);
+int file_line_length(FILE* f) {
+	int current_file_offset = ftell(f);
 	int count = 0;
 	char current;
 	do {
 		count += 1;
-		current = fgetc(*f);
+		current = fgetc(f);
 	} while(current != '\n');
-	fseek(*f, current_file_offset, SEEK_SET);
+	fseek(f, current_file_offset, SEEK_SET);
 	return count;
 }
 //Function that read for the given file into the buffer until the predicate is false.
-void file_read_until(FILE** f, char* buffer, int(*predicate)(char)) {
+void file_read_until(FILE* f, char* buffer, int(*predicate)(char)) {
 	int i = 0;
 	char current;
 	fflush(stdout);
 	do {
-		current = fgetc(*f);
+		current = fgetc(f);
 		buffer[i] = current;
 		i++;
 	} while(predicate(current));
@@ -56,12 +57,12 @@ void file_read_until(FILE** f, char* buffer, int(*predicate)(char)) {
 }
 
 //This function, given a dictionary pointed by f SEEK_CUR, finds the offset of its' closing parenthesis.
-int find_dict_end(FILE** f) {
-	int current_file_offset = ftell(*f);
+int find_dict_end(FILE* f) {
+	int current_file_offset = ftell(f);
 	int offset = 0;
 	int pcount = 0;
 	do {
-		char current = fgetc(*f);
+		char current = fgetc(f);
 		if(current == '{') {
 			pcount += 1;
 		}
@@ -70,24 +71,24 @@ int find_dict_end(FILE** f) {
 		}
 		offset++;
 	} while(pcount);
-	fseek(*f, current_file_offset + 1, SEEK_SET);
+	fseek(f, current_file_offset + 1, SEEK_SET);
 	return offset + current_file_offset-1;
 }
 //This function parses a node from the file.
 //	node - the node buffer to fill.
 //	is_dict - if the parsed node is dictionary *is_dict = 1, else 0.
-void parse_node(FILE** f, DictNode* node, bool* is_dict) {
+void parse_node(FILE* f, DictNode* node, bool* is_dict) {
 	file_trim(f);
 	int line_length = file_line_length(f);
 	char* node_key = (char*)malloc(line_length);
 	char* node_value = (char*)malloc(line_length);
 	file_trim(f);
 	file_read_until(f, node_key, isascii_modified);
-	fseek(*f, 1L, SEEK_CUR);
+	fseek(f, 1L, SEEK_CUR);
 	file_trim(f);
 	file_read_until(f, node_value, isascii_modified);
 	if (node_value[0] == '{') {
-		fseek(*f, -strlen(node_value)-1, SEEK_CUR);
+		fseek(f, -strlen(node_value)-1, SEEK_CUR);
 		Dictionary* nested_dictionary = parse_conf_dict(f);
 		node->key = node_key;
 		node->value = nested_dictionary;
@@ -104,12 +105,12 @@ void parse_node(FILE** f, DictNode* node, bool* is_dict) {
 }
 
 //This function parses a configuration file into a dictionary.
-Dictionary* parse_conf_dict(FILE** f) {
+Dictionary* parse_conf_dict(FILE* f) {
 	Dictionary* result = dictionary_init(100);
 	int dict_end_offset = find_dict_end(f);
 	fflush(stdout);
 	int current_offset;
-	while  ((current_offset = ftell(*f)) < dict_end_offset) {
+	while  ((current_offset = ftell(f)) < dict_end_offset) {
 		// parse nodes, until the current offset is outside of the dictionary.
 		DictNode* node = (DictNode*)malloc(sizeof(DictNode));
 		bool is_dict;
@@ -134,7 +135,7 @@ Dictionary* parse_conf(char* path) {
 		fprintf(stderr, "file open error\n");
 		exit(0);
 	}
-	Dictionary* conf_dict = parse_conf_dict(&f);
+	Dictionary* conf_dict = parse_conf_dict(f);
 	fclose(f);
 	return conf_dict;
 }
