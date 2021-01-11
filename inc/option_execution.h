@@ -1,6 +1,8 @@
 #pragma once
 #ifndef OPTACTOR_H_
 #define OPTACTOR_H_
+#include <stdbool.h>
+
 #include "structs/dictionary.h"
 #include "net/net.h"
 /*
@@ -9,7 +11,7 @@
 typedef struct Options_t {
 	char* source_file;
 	char* dest_host;
-	char* type;
+	bool transfer;
 } Options;
 
 /*

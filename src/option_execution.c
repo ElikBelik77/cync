@@ -13,7 +13,7 @@ Options* parse_options(Dictionary* conf, int argc, char** argv) {
 	opts->dest_host = (char*)dictionary_get(((Dictionary*)dictionary_get(conf, "hosts")), "default");
 	int c;
 	while (1) {
-		c = getopt(argc, argv, "f:h:t:");
+		c = getopt(argc, argv, "f:h:t");
 		if (c == -1)
 			break;
 		switch (c) {
@@ -26,7 +26,7 @@ Options* parse_options(Dictionary* conf, int argc, char** argv) {
 				optarg);
 				break;
 			case 't':
-				opts->type = optarg;
+				opts->transfer = 1;
 				break;
 			case '?':
 				break;
@@ -61,7 +61,7 @@ void transfer_file(NetWorker* net_worker, Options* opts) {
 	queue_insert(net_worker->out_message_queue, msg);
 }
 void act(NetWorker* net_worker, Options* opts) {
-	if (!strcmp(opts->type, "transfer")) {
+	if (opts->transfer) {
 		transfer_file(net_worker, opts);
 	}
 }

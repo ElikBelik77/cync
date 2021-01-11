@@ -33,4 +33,7 @@ clean:
 	rm -rf build
 	find . -name *.save | xargs rm -f
 
+format:
+		clang-format -i -style=file src/*.c inc/*.h
+
 MKDIR_P := mkdir -p
