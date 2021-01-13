@@ -7,6 +7,6 @@
         This function parses a configuration file into a dictionary.
                 path - the path to the configuration file.
 */
-Dictionary *parse_conf(char *path);
+dictionary_t *parse_conf(char *path);
 
 #endif

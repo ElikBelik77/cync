@@ -21,7 +21,7 @@ void net_read(int sockfd, uint32_t nbytes, char* buffer);
 void net_write(int sockfd, uint32_t nbytes, char* buffer);
 
 // Writes a given network message to a socket fd.
-void net_message_write(NetMessageOut* net_msg) {
+void net_message_write(net_message_out_t* net_msg) {
 	struct sockaddr_in dest_addr;
 	int sockfd;
 	memset(&dest_addr, 0, sizeof(struct sockaddr_in));
@@ -45,21 +45,19 @@ void net_message_write(NetMessageOut* net_msg) {
 }
 
 // Read a network message from a given socket fd.
-NetMessageIn* net_message_read(int sockfd) {
+net_message_in_t* net_message_read(int sockfd) {
 	// Reads length, then read length bytes.
 	uint32_t length;
 	net_read(sockfd, sizeof(uint32_t), (char*)&length);
 	char* payload_buffer = (char*)malloc(length+1);
 	net_read(sockfd, length, payload_buffer);
-	NetMessageIn* net_msg = (NetMessageIn*)malloc(sizeof(NetMessageIn));
+	net_message_in_t* net_msg = (net_message_in_t*)malloc(sizeof(net_message_in_t));
 	net_msg->payload_size = length;
 	net_msg->payload = payload_buffer;
 	return net_msg;
 }
 
-
-
-int init_net_server(NetWorker* worker) {
+int init_net_server(net_worker_t* worker) {
 	struct sockaddr_in servaddr;
 	// Initialzie a tcp socket.
 	int sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -82,11 +80,11 @@ int init_net_server(NetWorker* worker) {
 }
 
 void* net_sender_routine(void* arg) {
-	NetWorker* context = (NetWorker*)arg;
+	net_worker_t* context = (net_worker_t*)arg;
 	while (context->is_running) {
 		sleep(1);
 		while (!queue_is_empty(context->out_message_queue)) {
-			NetMessageOut* msg = (NetMessageOut*)queue_pop(context->out_message_queue);
+			net_message_out_t* msg = (net_message_out_t*)queue_pop(context->out_message_queue);
 			_debug(printf("[D] Popped a message to send to %s\n", msg->dest);)
 			_debug(fflush(stdout);)
 			net_message_write(msg);
@@ -97,7 +95,7 @@ void* net_sender_routine(void* arg) {
 }
 
 void* net_worker_routine(void* arg) {
-	NetWorker* context = (NetWorker*)arg;
+	net_worker_t* context = (net_worker_t*)arg;
 	int connfd, sockfd = init_net_server(context);
 	pthread_t* sender_thread = (pthread_t*)malloc(sizeof(pthread_t));
 	pthread_create(sender_thread, NULL, net_sender_routine, (void*)context);
@@ -118,7 +116,7 @@ void* net_worker_routine(void* arg) {
 		address_len = 0;
 		memset(&client_addr, 0, sizeof(client_addr));
 		connfd = accept(sockfd, (struct sockaddr*)&client_addr, &address_len);
-		NetMessageIn* cli_msg = net_message_read(connfd);
+		net_message_in_t* cli_msg = net_message_read(connfd);
 		queue_insert(context->in_message_queue, cli_msg);
 		_debug(printf("[D] Message received size: %d\n",cli_msg->payload_size);)
 	}
@@ -130,7 +128,7 @@ void* net_worker_routine(void* arg) {
 	return NULL;
 }
 
-void init_threading(NetWorker* worker) {
+void init_threading(net_worker_t* worker) {
 	pthread_t* worker_thread = (pthread_t*)malloc(sizeof(pthread_t));
 	assert(worker_thread);
 	int result = pthread_create(worker_thread, NULL, net_worker_routine, (void*)worker);
@@ -138,7 +136,7 @@ void init_threading(NetWorker* worker) {
 	worker->worker_thread = worker_thread;
 }
 
-void net_worker_free(NetWorker* worker) {
+void net_worker_free(net_worker_t* worker) {
 		// Ask for stop, upon pollfd timeout the thread will join.
 		worker->is_running = 0;
 		void* ret_val;

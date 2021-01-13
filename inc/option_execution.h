@@ -8,19 +8,19 @@
 /*
         Struct for holding cli program arguments.
 */
-typedef struct Options_t {
+typedef struct {
   char *source_file;
   char *dest_host;
   bool transfer;
-} Options;
+} options_t;
 
 /*
         This function parsses given cli arguments into Options_t struct.
 */
-Options *parse_options(Dictionary *conf, int argc, char **argv);
+options_t *parse_options(dictionary_t *conf, int argc, char **argv);
 
 /*
         This function act according to options.
 */
-void act(NetWorker *net_worker, Options *opt);
+void act(net_worker_t *net_worker, options_t *opt);
 #endif

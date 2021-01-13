@@ -10,15 +10,18 @@
 /*
 	Struct for NetWorker objects.
 */
-typedef struct NetWorker_t {
+typedef struct {
 	int sock_fd, port;
 	volatile bool is_running;
-	pthread_t* worker_thread;
-	Queue* in_message_queue;
-	Queue* out_message_queue;
-} NetWorker;
+	pthread_t *worker_thread;
+	queue_t *in_message_queue;
+	queue_t *out_message_queue;
+} net_worker_t;
 
-void init_threading(NetWorker* worker);
+void init_threading(net_worker_t *worker);
 
 #endif
 #endif
+
+
+typedef int silence_iso_posix_net;

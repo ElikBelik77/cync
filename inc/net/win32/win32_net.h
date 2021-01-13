@@ -13,18 +13,19 @@
 /*
 	Strcut for NetWorker objects.
 */
-typedef struct NetWorker_t {
-  int port;
+typedef struct {
+	int port;
 	SOCKET sock;
 	volatile bool is_running;
 	DWORD worker_thread_id;
 	HANDLE worker_thread_handle;
-	Queue* in_message_queue;
-	Queue* out_message_queue;
-} NetWorker;
+	queue_t *in_message_queue;
+	queue_t *out_message_queue;
+} net_worker_t;
 
 
-void init_threading(NetWorker* worker);
+void init_threading(net_worker_t *worker);
 
 #endif
 #endif
+typedef int silence_iso_win_net;

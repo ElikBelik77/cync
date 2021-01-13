@@ -4,23 +4,23 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct DictNode_t {
+typedef struct DictNode {
 	char* key;
 	void* value;
-	struct DictNode_t* next;
+	struct DictNode* next;
 	void (*free_ptr)(void* value);
 	int is_dict:1;
-} DictNode;
+} dict_node_t;
 
 
-typedef struct Dictionary_t {
+typedef struct {
 	size_t size;
-	DictNode** nodes;
-} Dictionary;
+	dict_node_t **nodes;
+} dictionary_t;
 
-Dictionary* dictionary_init(size_t dict_size);
-void dictionary_insert(Dictionary* dict, char* key, void* value, void (*free_ptr)(void* value));
-void* dictionary_get(Dictionary* dict, char* key);
-void dictionary_free(Dictionary* dict);
-void dictionary_print(Dictionary* dict);
+dictionary_t* dictionary_init(size_t dict_size);
+void dictionary_insert(dictionary_t *dict, char* key, void* value, void (*free_ptr)(void* value));
+void* dictionary_get(dictionary_t *dict, char* key);
+void dictionary_free(dictionary_t *dict);
+void dictionary_print(dictionary_t *dict);
 #endif

@@ -4,35 +4,35 @@
 #include <stdbool.h>
 #include "dlinkedlist.h"
 
-typedef struct Queue_t {
-	DLinkedList* head;
-	DLinkedList* tail;
-} Queue;
+typedef struct {
+	dlinkedlist_t* head;
+	dlinkedlist_t* tail;
+} queue_t;
 
 /*
 	Creates a new queue.
 */
-Queue* queue_create();
+queue_t* queue_create();
 
 /*
 	Inserts a new element to the back of the queue.
 */
-void queue_insert(Queue* q, void* element);
+void queue_insert(queue_t* q, void* element);
 
 /*
 	Pops an element from the front of the queue.
 */
-void* queue_pop(Queue* q);
+void* queue_pop(queue_t* q);
 
 /*
 	Checks if a given queue is empty.
 */
-bool queue_is_empty(Queue* q);
+bool queue_is_empty(queue_t* q);
 
 /*
 	Frees a queue
 	free_ptr: a function pointer that will be used to free the data
 		  at every queue node.
 */
-void queue_free(Queue* q, void (*free_ptr)(void*));
+void queue_free(queue_t* q, void (*free_ptr)(void*));
 #endif
